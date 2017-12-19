@@ -5,10 +5,10 @@ var path = require('path');
 module.exports = {
   // Tell Webpack which file kicks off our app.
   entry: path.resolve(__dirname, 'src/index.js'),
-  // Tell Weback to output our bundle to ./dist/bundle.js
+  // Tell Weback to output our bundle to ./docs/bundle.js
   output: {
     filename: 'bundle.[hash].js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'docs')
   },
   // Tell Webpack which directories to look in to resolve import statements.
   // Normally Webpack will look in node_modules by default but since we’re overriding
@@ -52,7 +52,7 @@ module.exports = {
   // Enable the Webpack dev server which will build, serve, and reload our
   // project on changes.
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
+    contentBase: path.join(__dirname, 'docs'),
     compress: true,
     port: 9000,
     historyApiFallback: {
