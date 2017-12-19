@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A hello world example of polymer-webpack-loader.",
   "scripts": {
-    "start": "webpack-dev-server --open",
+    "start": "webpack-dev-server",
     "build": "webpack"
   },
   "author": "Rob Dodson",

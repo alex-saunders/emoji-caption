@@ -1,12 +1,14 @@
-<link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/paper-styles/typography.html">
+<link rel="import" href="~/polymer/polymer-element.html">
+<link rel="import" href="~/paper-styles/typography.html">
+<link rel="import" href="~/iron-pages/iron-pages.html">
 
-<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../bower_components/paper-card/paper-card.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="~/app-route/app-location.html">
+<link rel="import" href="~/app-route/app-route.html">
+
+<link rel="import" href="~/paper-tabs/paper-tabs.html">
+<link rel="import" href="~/paper-tabs/paper-tab.html">
+
+<link rel="import" href="./views/image-input-view.html">
 
 <custom-style>
   <style is="custom-style">
@@ -35,14 +37,6 @@
 <dom-module id="emoji-caption-app">
   <template>
     <style>
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
 
       :host {
         display: flex;
@@ -58,16 +52,6 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
-        max-width: 500px;
-      }
-      paper-card {
-        width: 100%;
-      }
-      paper-icon-button {
-        color: var(--theme-primary)
-      }
-      paper-input {
-        --paper-input-container-focus-color: var(--theme-primary)
       }
 
       .page-title {
@@ -80,44 +64,38 @@
         margin: 0 8px;
         font-weight: 300;
       }
+
+      iron-pages {
+        width: 100%;
+        max-width: 500px;
+      }
+
       .caption {
         @apply --paper-font-caption;
         padding: 8px;
-      }
-
-      a {
-        color: var(--theme-primary);
-        text-decoration: none;
-      }
-
-      @media (max-width: 760px) { 
-        :host {
-          justify-content: space-between;
-        }
-        paper-card {
-          box-shadow: none;
-        }
       }
     </style>
     <!-- ☪️ 🅰️ 🅿️ ✝️ ℹ️ 🅾️ ♑️ -->
     <div></div>
     <div class="content-container">
+        <app-location route="{{route}}"></app-location>
+        <app-route
+          route="{{route}}"
+          pattern="/:view"
+          data="{{routeData}}"
+          tail="{{subroute}}"></app-route>
+
       <h1 class="page-title">
         <span class="page-title-emoji">[[emoji1]]</span>
         <span class="page-title-text">Emoji Caption</span>
         <span class="page-title-emoji">[[emoji2]]</span>
-      </h1>          
-      <paper-card>
-        <div class="card-content">        
-          <paper-input label="Image URL">
-          <paper-icon-button icon="send" slot="suffix"></paper-icon-button>   
-          </paper-input>    
-          <div>
-            <paper-icon-button icon="image:photo-library"></paper-icon-button>
-            <!-- <paper-icon-button icon="image:photo-camera"></paper-icon-button> -->
-          </div> 
-        </div> 
-      </paper-card> 
+      </h1>  
+
+      <iron-pages selected="[[routeData.view]]" attr-for-selected="data-route">
+        <image-input-view data-route="" route="{{subroute}}">hi</image-input-view>
+        <div data-route="caption">caption</div>
+      </iron-pages>
+
     </div>
     <span class="caption">Made with ❤️ by <a>Alex</a>. Find the source on <a>Github</a></span>
   </template>
@@ -149,8 +127,6 @@
 
       connectedCallback() {
         super.connectedCallback()
-
-        console.log('CONNECTED')
       }
 
       getEmoji() {

@@ -7,7 +7,7 @@ module.exports = {
   entry: path.resolve(__dirname, 'src/index.js'),
   // Tell Weback to output our bundle to ./dist/bundle.js
   output: {
-    filename: 'bundle.js',
+    filename: 'bundle.[hash].js',
     path: path.resolve(__dirname, 'dist')
   },
   // Tell Webpack which directories to look in to resolve import statements.
@@ -18,7 +18,10 @@ module.exports = {
     modules: [
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'bower_components')
-    ]
+    ],
+    alias: {
+      "~": path.resolve(__dirname, 'bower_components/')
+    }
   },
   // These rules tell Webpack how to process different module types.
   // Remember, *everything* is a module in Webpack. That includes
@@ -51,7 +54,10 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     compress: true,
-    port: 9000
+    port: 9000,
+    historyApiFallback: {
+      index: '/'
+    }
   },
   plugins: [
     // This plugin will generate an index.html file for us that can be used
