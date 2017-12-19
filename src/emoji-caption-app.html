@@ -87,9 +87,8 @@
         <app-location route="{{route}}"></app-location>
         <app-route
           route="{{route}}"
-          pattern="/:view"
-          data="{{routeData}}"
-          tail="{{subroute}}"></app-route>
+          pattern="/emoji-caption/:view"
+          data="{{routeData}}"></app-route>
 
       <h1 class="page-title">
         <span class="page-title-emoji">[[emoji1]]</span>
@@ -100,12 +99,12 @@
       <iron-pages selected="[[routeData.view]]" attr-for-selected="data-route">
         <!-- Need to do this little hack to get it working on github pages as
           the base URL is /emoji-caption -->
-        <image-input-view data-route="emoji-caption" route={{subroute}} image={{image}}></image-input-view>
-        <image-caption-view data-route="emoji-caption/caption" image={{image}}></image-caption-view>
+        <!-- <image-input-view data-route="emoji-caption" route={{subroute}} image={{image}}></image-input-view>
+        <image-caption-view data-route="emoji-caption/caption" image={{image}}></image-caption-view> -->
           
         <!-- Real routes -->
-        <image-input-view data-route="" route="{{subroute}}" image={{image}}></image-input-view>
-        <image-caption-view data-route="caption" image={{image}}></image-caption-view>
+        <image-input-view data-route="" route="{{route}}" image={{image}}></image-input-view>
+        <image-caption-view data-route="caption" route={{route}} image={{image}}></image-caption-view>
       </iron-pages>
 
     </div>
@@ -165,9 +164,9 @@
         this.emoji1 = this.getEmoji()
         this.emoji2 = this.getEmoji()
 
-
+        console.log(this.route)
         if (!this.image) {
-          this.set('route.path', '/');
+          this.set('route.path', '/emoji-caption/');
         }
       }
 

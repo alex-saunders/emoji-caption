@@ -133,7 +133,9 @@
         this.$['iron-form'].addEventListener('iron-form-presubmit', this._loadImage);
       }
 
-      _loadImage = () => {
+      _loadImage = (e) => {
+        e.preventDefault()
+
         if (this.imageURL == null) {
           console.log('no image selected!')
           return;
@@ -148,7 +150,8 @@
         }).then((myBlob) => {
           const objectURL = URL.createObjectURL(myBlob);
           this.image = objectURL
-          this.set('route.path', window.location.host + '/caption');
+          
+          this.set('route.path', 'emoji-caption/caption/');
 
           clearTimeout(this.timeout);
           this.active = false;
