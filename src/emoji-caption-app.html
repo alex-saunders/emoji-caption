@@ -1,0 +1,166 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/image-icons.html">
+
+<custom-style>
+  <style is="custom-style">
+    html, body {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #fcfcfc;
+
+      --theme-primary: #009688;
+    }
+    @media (max-width: 760px) { 
+      body {
+        background: #fff;
+      }
+    }
+    * {
+      box-sizing: inherit;
+    }
+  </style>
+</custom-style>
+
+<dom-module id="emoji-caption-app">
+  <template>
+    <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      :host {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+      }
+
+      .content-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 500px;
+      }
+      paper-card {
+        width: 100%;
+      }
+      paper-icon-button {
+        color: var(--theme-primary)
+      }
+      paper-input {
+        --paper-input-container-focus-color: var(--theme-primary)
+      }
+
+      .page-title {
+        @apply --paper-font-headline;
+      }
+      .page-title-emoji {
+        animation: fadeIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1) 1
+      }
+      .page-title-text {
+        margin: 0 8px;
+        font-weight: 300;
+      }
+      .caption {
+        @apply --paper-font-caption;
+        padding: 8px;
+      }
+
+      a {
+        color: var(--theme-primary);
+        text-decoration: none;
+      }
+
+      @media (max-width: 760px) { 
+        :host {
+          justify-content: space-between;
+        }
+        paper-card {
+          box-shadow: none;
+        }
+      }
+    </style>
+    <!-- ☪️ 🅰️ 🅿️ ✝️ ℹ️ 🅾️ ♑️ -->
+    <div></div>
+    <div class="content-container">
+      <h1 class="page-title">
+        <span class="page-title-emoji">[[emoji1]]</span>
+        <span class="page-title-text">Emoji Caption</span>
+        <span class="page-title-emoji">[[emoji2]]</span>
+      </h1>          
+      <paper-card>
+        <div class="card-content">        
+          <paper-input label="Image URL">
+          <paper-icon-button icon="send" slot="suffix"></paper-icon-button>   
+          </paper-input>    
+          <div>
+            <paper-icon-button icon="image:photo-library"></paper-icon-button>
+            <!-- <paper-icon-button icon="image:photo-camera"></paper-icon-button> -->
+          </div> 
+        </div> 
+      </paper-card> 
+    </div>
+    <span class="caption">Made with ❤️ by <a>Alex</a>. Find the source on <a>Github</a></span>
+  </template>
+
+  <script>
+    const emoji = require("emojilib")
+    /**
+     * @customElement
+     * @polymer
+     */
+    class EmojiCaptionApp extends Polymer.Element {
+      static get is() { return 'emoji-caption-app'; }
+      static get properties() {
+        return {
+          emoji1: {
+            type: String,
+            value: function() {
+              return this.getEmoji()
+            }
+          },
+          emoji2: {
+            type: String,
+            value: function() {
+              return this.getEmoji()
+            }
+          }
+        };
+      }
+
+      connectedCallback() {
+        super.connectedCallback()
+
+        console.log('CONNECTED')
+      }
+
+      getEmoji() {
+        const entries = Object.entries(emoji.lib)
+        const entry = entries[Math.floor(Math.random() * entries.length)][1]
+        console.log(entry.char)
+        return entry.char
+      }
+    }
+
+    window.customElements.define(EmojiCaptionApp.is, EmojiCaptionApp);
+  </script>
+</dom-module>
