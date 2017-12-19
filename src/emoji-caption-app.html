@@ -1,5 +1,6 @@
 <link rel="import" href="~/polymer/polymer-element.html">
 <link rel="import" href="~/paper-styles/typography.html">
+<link rel="import" href="~/paper-styles/color.html">
 <link rel="import" href="~/iron-pages/iron-pages.html">
 
 <link rel="import" href="~/app-route/app-location.html">
@@ -9,6 +10,7 @@
 <link rel="import" href="~/paper-tabs/paper-tab.html">
 
 <link rel="import" href="./views/image-input-view.html">
+<link rel="import" href="./views/image-caption-view.html">
 
 <custom-style>
   <style is="custom-style">
@@ -21,7 +23,7 @@
       height: 100vh;
       background: #fcfcfc;
 
-      --theme-primary: #009688;
+      --theme-primary: var(--paper-deep-purple-a700);
     }
     @media (max-width: 760px) { 
       body {
@@ -74,6 +76,10 @@
         @apply --paper-font-caption;
         padding: 8px;
       }
+      .caption > a {
+        color: var(--theme-primary);
+        text-decoration: none;
+      }
     </style>
     <!-- ☪️ 🅰️ 🅿️ ✝️ ℹ️ 🅾️ ♑️ -->
     <div></div>
@@ -94,14 +100,20 @@
       <iron-pages selected="[[routeData.view]]" attr-for-selected="data-route">
         <!-- Need to do this little hack to get it working on github pages as
           the base URL is /emoji-caption -->
-        <image-input-view data-route="emoji-caption" route={{subroute}}></image-input-view>
-
-        <image-input-view data-route="" route="{{subroute}}"></image-input-view>
-        <div data-route="caption">caption</div>
+        <image-input-view data-route="emoji-caption" route={{subroute}} image={{image}}></image-input-view>
+        <image-caption-view data-route="emoji-caption/caption" image={{image}}>caption</div>
+          
+        <!-- Real routes -->
+        <image-input-view data-route="" route="{{subroute}}" image={{image}}></image-input-view>
+        <image-caption-view data-route="caption" image={{image}}>caption</div>
       </iron-pages>
 
     </div>
-    <span class="caption">Made with ❤️ by <a>Alex</a>. Find the source on <a>Github</a></span>
+    <span class="caption">Made with ❤️ by 
+      <a href="https://twitter.com/AlexJRsaunders" rel="noopener" target="_blank">Alex</a>
+      . Find the source on 
+      <a href="https://github.com/alex-saunders/emoji-caption" rel="noopener" target="_blank">Github</a>
+    </span>
   </template>
 
   <script>
@@ -116,27 +128,53 @@
         return {
           emoji1: {
             type: String,
-            value: function() {
-              return this.getEmoji()
-            }
+            value: " "
           },
           emoji2: {
             type: String,
-            value: function() {
-              return this.getEmoji()
-            }
+            value: " "
+          },
+          image: {
+            type: String
           }
         };
       }
 
+      constructor() {
+        super()
+
+        // get all emojis that have either any of the following keywords
+        // associated with them
+        const keywordsToInclude = ['face', 'photo']
+
+        this.entries = Object.entries(emoji.lib).filter((entry) => {
+          const keywords = entry[1].keywords
+          if (keywords && keywords.length > 0) {
+            for (let keywordToInclude of keywordsToInclude) {
+              if (keywords.includes(keywordToInclude)) { return true }
+            }
+            return false
+          }
+          return false
+        })
+      }
+
       connectedCallback() {
         super.connectedCallback()
+
+        this.emoji1 = this.getEmoji()
+        this.emoji2 = this.getEmoji()
+
+
+        if (!this.image) {
+          this.set('route.path', '/');
+        }
       }
 
       getEmoji() {
-        const entries = Object.entries(emoji.lib)
-        const entry = entries[Math.floor(Math.random() * entries.length)][1]
-        console.log(entry.char)
+        const index = Math.floor(Math.random() * this.entries.length)
+        const entry = this.entries[index][1]
+
         return entry.char
       }
     }

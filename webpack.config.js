@@ -10,6 +10,7 @@ module.exports = {
     filename: 'bundle.[hash].js',
     path: path.resolve(__dirname, 'docs')
   },
+  devtool: 'cheap-eval-source-map',
   // Tell Webpack which directories to look in to resolve import statements.
   // Normally Webpack will look in node_modules by default but since we’re overriding
   // the property we’ll need to tell it to look there in addition to the
@@ -36,7 +37,12 @@ module.exports = {
         // polymer-webpack-loader, and hand the output to
         // babel-loader. This let's us transpile JS in our `<script>` elements.
         use: [
-          { loader: 'babel-loader' },
+          { 
+            loader: 'babel-loader',
+            query: {
+              plugins: ['transform-class-properties']
+            }
+          },
           { loader: 'polymer-webpack-loader' }
         ]
       },

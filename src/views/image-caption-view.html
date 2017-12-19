@@ -1,0 +1,43 @@
+<link rel="import" href="~/polymer/polymer-element.html">
+
+<dom-module id="image-caption-view">
+  <template>
+    <style>
+      :host {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      img {
+        max-width: 100%;
+      }
+    </style>
+        
+      <img id="img" src={{image}}>
+
+  </template>
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class ImageCaptionView extends Polymer.Element {
+      static get is() { return 'image-caption-view'; }
+      static get properties() {
+        return {
+          image: {
+            type: String,
+          },
+        };
+      }
+
+      connectedCallback() {
+        super.connectedCallback()
+      }
+    }
+
+    window.customElements.define(ImageCaptionView.is, ImageCaptionView);
+  </script>
+</dom-module>

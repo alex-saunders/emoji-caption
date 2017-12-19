@@ -1,12 +1,16 @@
 <link rel="import" href="~/polymer/polymer-element.html">
 <link rel="import" href="~/paper-styles/typography.html">
 
+<link rel="import" href="~/iron-form/iron-form.html">
 <link rel="import" href="~/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="~/paper-input/paper-input.html">
 <link rel="import" href="~/paper-card/paper-card.html">
 <link rel="import" href="~/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="~/iron-icons/iron-icons.html">
 <link rel="import" href="~/iron-icons/iron-icons.html">
 <link rel="import" href="~/iron-icons/image-icons.html">
+<link rel="import" href="~/paper-spinner/paper-spinner.html">
 
 <dom-module id="image-input-view">
   <template>
@@ -24,6 +28,36 @@
         width: 100%;
       }
 
+      .card-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .form {
+        width: 100%;
+      }
+
+      .spinner-overlay {
+        animation: fadeIn 0.2s linear 1;
+        pointer-events: all;
+      }
+      .spinner-overlay[hidden] {
+        display: none;
+        pointer-events: none;
+      }
+      .spinner-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.9)
+      }
+
       paper-card {
         width: 100%;
       }
@@ -32,12 +66,6 @@
       }
       paper-input {
         --paper-input-container-focus-color: var(--theme-primary)
-      }
-
-
-      a {
-        color: var(--theme-primary);
-        text-decoration: none;
       }
 
       @media (max-width: 760px) { 
@@ -51,14 +79,24 @@
     </style>
         
     <paper-card>
-      <div class="card-content">        
-        <paper-input label="Image URL">
-        <paper-icon-button icon="send" slot="suffix" on-click="_changeText"></paper-icon-button>   
-        </paper-input>    
-        <div>
-          <paper-icon-button icon="image:photo-library"></paper-icon-button>
-          <!-- <paper-icon-button icon="image:photo-camera"></paper-icon-button> -->
-        </div> 
+      <div class="card-content">  
+          <div class="form">
+            <iron-form id="iron-form">  
+              <form on-submit="_loadImage">    
+                <paper-input value={{imageURL}} on-keydown="_checkForEnter" label="Image URL">
+                <paper-icon-button icon="send" slot="suffix" on-tap="_submitForm" type="submit"></paper-icon-button>   
+              </paper-input>    
+              </form>
+            </iron-form>
+            <div>
+              <paper-icon-button icon="image:photo-library"></paper-icon-button>
+              <!-- <paper-icon-button icon="image:photo-camera"></paper-icon-button> -->
+            </div> 
+          </div>          
+          <div class="spinner-overlay" hidden={{!active}}>
+            <paper-spinner alt="loading..." active={{active}}></paper-spinner>
+          </div>
+        
       </div> 
     </paper-card> 
   </template>
@@ -75,21 +113,56 @@
         return {
           image: {
             type: String,
-            // value: 'test',
+            notify: true,
+          },
+          imageURL: {
+            type: String,
+          },
+          active: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true,
+            notify: true
           }
         };
       }
 
       connectedCallback() {
         super.connectedCallback()
+
+        this.$['iron-form'].addEventListener('iron-form-presubmit', this._loadImage);
       }
 
-      _changeText() {
-        if (this.image == null) {
-          alert('no image selected!')
+      _loadImage = () => {
+        if (this.imageURL == null) {
+          console.log('no image selected!')
           return;
         }
-        this.set('route.path', window.location.host + '/caption');
+
+        this.timeout = setTimeout(() => {
+          this.active = true
+        }, 200);
+
+        fetch(this.imageURL).then((response) => {
+          return response.blob();
+        }).then((myBlob) => {
+          const objectURL = URL.createObjectURL(myBlob);
+          this.image = objectURL
+          this.set('route.path', window.location.host + '/caption');
+
+          clearTimeout(this.timeout);
+          this.active = false;
+        });
+      }
+
+      _submitForm() {
+        this.$['iron-form'].submit();
+      }
+
+      _checkForEnter(e) {
+        if (e.keyCode === 13) {
+          this._submitForm();
+        }
       }
     }
 

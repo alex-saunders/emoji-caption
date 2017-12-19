@@ -25,6 +25,8 @@
     "iron-lazy-pages": "TimvdLippe/iron-lazy-pages#^2.1.1",
     "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
     "app-route": "PolymerElements/app-route#^2.0.3",
-    "iron-pages": "PolymerElements/iron-pages#^2.0.1"
+    "iron-pages": "PolymerElements/iron-pages#^2.0.1",
+    "iron-form": "PolymerElements/iron-form#^2.0.1",
+    "paper-spinner": "PolymerElements/paper-spinner#^2.0.0"
   }
 }
