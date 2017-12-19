@@ -92,7 +92,11 @@
       </h1>  
 
       <iron-pages selected="[[routeData.view]]" attr-for-selected="data-route">
-        <image-input-view data-route="" route="{{subroute}}">hi</image-input-view>
+        <!-- Need to do this little hack to get it working on github pages as
+          the base URL is /emoji-caption -->
+        <image-input-view data-route="emoji-caption" route={{subroute}}></image-input-view>
+
+        <image-input-view data-route="" route="{{subroute}}"></image-input-view>
         <div data-route="caption">caption</div>
       </iron-pages>
 
