@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hello World</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="Polymer-App description">
+    
+    <link rel="manifest" href="/manifest.json">
+  </head>
+  <body>
+    <emoji-caption-app></emoji-caption-app>
+    
+    <!--
+      Use the webcomponents-loader script which will feature detect which Web
+      Components features are missing and lazy load the appropriate polyfills.
+      When we hear the 'WebComponentsReady' event from the polyfill bundle we can
+      insert our 'bundle.js'.
+    -->
+    <script>
+      (function() {
+        document.addEventListener('WebComponentsReady', function componentsReady() {
+          document.removeEventListener('WebComponentsReady', componentsReady, false);
+          var script = document.createElement('script');
+          script.src = 'bundle.60cbe4bb37b6a9216ffc.js';
+          var refScript = document.getElementsByTagName('script')[0];
+          refScript.parentNode.insertBefore(script, refScript);
+        }, false);
+      })();
+    </script>
+    <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+  </body>
+</html>
