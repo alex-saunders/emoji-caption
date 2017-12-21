@@ -17,6 +17,7 @@
 
   <script>
     const queryString = require('query-string');
+    const credentials = require('../../credentials.js');
 
     /**
      * @customElement
@@ -26,9 +27,8 @@
       static get is() { return 'emoji-caption-generator'; }
       static get properties() {
         return {
-          image: {
+          imageUrl: {
             type: String,
-            observer: '_imageUpdated'
           }
         };
       }
@@ -37,16 +37,13 @@
         super.connectedCallback()
       }
 
-      _imageUpdated(newval, oldval) {
-        console.log('image updated', newval);
-        if (newval !== oldval && newval != null) {
-          this._processImage(newval);
-        }
+      generateCaption() {
+        this._processImage();
       }
 
       _processImage(imageURL) {
-        const subscriptionKey = ""
-        const uriBase = "https://westeurope.api.cognitive.microsoft.com/vision/v1.0/analyze";
+        const subscriptionKey = credentials.azure.subscriptionKey
+        const uriBase = `https://${credentials.azure.region}.api.cognitive.microsoft.com/vision/v1.0/analyze`;
 
         const params = {
             "visualFeatures": "Categories,Description,Color",
@@ -64,24 +61,27 @@
         fetch(url, {
           headers: headers,
           method: 'POST',
-          body: `{"url": "${imageURL}"}`,
-          mode: 'no-cors'
+          body: `{"url": "${this.imageUrl}"}`,
+          // mode: 'no-cors'
         }).then((data) => {
           return data.json();
         }).then((response) => {
           this._captionGenerated(response);
         }).catch((err) => {
-          console.log(err);
+          this.dispatchEvent(new CustomEvent('captionError', {}));
         })
       }
 
       _captionGenerated(data) {
         const caption = data.description.captions[0].text;
+        const keywords = caption.split(" ");
+
+        console.log(keywords);
 
         this.dispatchEvent(new CustomEvent('captionGenerated', {
           detail: {
-            caption: caption,
-            keywords: caption.split(" ")
+            caption,
+            keywords
           }
         }));
       }

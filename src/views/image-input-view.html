@@ -83,7 +83,7 @@
           <div class="form">
             <iron-form id="iron-form">  
               <form on-submit="_loadImage">    
-                <paper-input value={{_imageUrl}} on-keydown="_checkForEnter" label="Image URL">
+                <paper-input value={{imageUrl}} on-keydown="_checkForEnter" label="Image URL">
                 <paper-icon-button icon="send" slot="suffix" on-tap="_submitForm" type="submit"></paper-icon-button>   
               </paper-input>    
               </form>
@@ -93,8 +93,8 @@
               <!-- <paper-icon-button icon="image:photo-camera"></paper-icon-button> -->
             </div> 
           </div>          
-          <div class="spinner-overlay" hidden={{!active}}>
-            <paper-spinner alt="loading..." active={{active}}></paper-spinner>
+          <div class="spinner-overlay" hidden={{!imageLoading}}>
+            <paper-spinner alt="loading..." active={{imageLoading}}></paper-spinner>
           </div>
         
       </div> 
@@ -111,18 +111,12 @@
       static get is() { return 'image-input-view'; }
       static get properties() {
         return {
-          image: {
-            type: String,
-            notify: true,
-          },
           imageUrl: {
             type: String,
             notify: true,
           },
-          active: {
+          imageLoading: {
             type: Boolean,
-            value: false,
-            reflectToAttribute: true,
             notify: true
           }
         };
@@ -137,25 +131,11 @@
       _loadImage = (e) => {
         e.preventDefault()
 
-        if (this._imageUrl == null) {
-          console.log('no image selected!')
-          return;
-        }
-
-        this.timeout = setTimeout(() => {
-          this.active = true
-        }, 200);
-
-        fetch(this._imageUrl).then((response) => {
-          return response.blob();
-        }).then((myBlob) => {
-          const objectURL = URL.createObjectURL(myBlob);
-          this.image = objectURL
-          this.imageUrl = this._imageUrl
-          
-          clearTimeout(this.timeout);
-          this.active = false;
-        });
+        this.dispatchEvent(new CustomEvent('imageUrlSubmitted', {
+          detail: {
+            url: this.imageUrl
+          }
+        }));
       }
 
       _submitForm() {

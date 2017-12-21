@@ -63,6 +63,13 @@ module.exports = {
     port: 9000,
     historyApiFallback: {
       index: '/'
+    },
+    proxy: {
+      "/emoji-caption/**/*.js": {
+        target: "http://localhost:9000",
+        pathRewrite: {"^/emoji-caption" : ""}
+    
+      }
     }
   },
   plugins: [

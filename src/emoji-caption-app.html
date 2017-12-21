@@ -8,6 +8,7 @@
 
 <link rel="import" href="~/paper-tabs/paper-tabs.html">
 <link rel="import" href="~/paper-tabs/paper-tab.html">
+<link rel="import" href="~/paper-dialog/paper-dialog.html">
 
 <link rel="import" href="./views/image-input-view.html">
 <link rel="import" href="./views/image-caption-view.html">
@@ -23,16 +24,16 @@
       margin: 0;
       width: 100vw;
       height: 100vh;
+      padding: 16px;
       overflow: auto;
-      background: #fcfcfc;
+      background: #004D40;
+      color: white;
 
-      --theme-primary: var(--paper-deep-purple-a700);
-      --theme-secondary: var(--paper-deep-purple-900);
-    }
-    @media (max-width: 760px) { 
-      body {
-        background: #fff;
-      }
+      --theme-primary: var(--paper-green-800);
+      --theme-secondary: var(--paper-green-a400);
+      --theme-accent: white;
+      
+      --accent-font: 'Lobster', cursive;
     }
     * {
       box-sizing: inherit;
@@ -52,11 +53,6 @@
         width: 100%;
         min-height: 100%;
       }
-      @media (max-width: 760px) { 
-        :host {
-          justify-content: space-around;
-        }
-      }
 
       .content-container {
         display: flex;
@@ -74,7 +70,8 @@
       }
       .page-title-text {
         margin: 0 8px;
-        font-weight: 300;
+        font-family: var(--accent-font);
+        /* font-weight: 300; */
       }
 
       iron-pages {
@@ -85,24 +82,33 @@
       .caption {
         @apply --paper-font-caption;
         padding: 8px;
+        font-family: var(--accent-font);
       }
       .caption > a {
-        color: var(--theme-primary);
+        color: var(--theme-secondary);
         text-decoration: none;
       }
     </style>
     <!-- ☪️ 🅰️ 🅿️ ✝️ ℹ️ 🅾️ ♑️ -->
     <h1 class="page-title">
       <span class="page-title-emoji">
-        <emoji-generator keywords=[[keyword1]]></emoji-generator>
+        <emoji-generator keyword=[[keyword1]]></emoji-generator>
       </span>
       <span class="page-title-text">Emoji Caption</span>
       <span class="page-title-emoji">
-        <emoji-generator keywords=[[keyword2]]></emoji-generator>
+        <emoji-generator keyword=[[keyword2]]></emoji-generator>
       </span>
     </h1>  
 
     <div class="content-container">
+      <paper-dialog id="modal" modal>
+        <p>
+          There was an error loading this image URL, please try again.
+        </p>
+        <div class="buttons">
+          <paper-button dialog-confirm autofocus>OK</paper-button>
+        </div>
+      </paper-dialog>
       <app-location route="{{route}}"></app-location>
       <app-route
         route="{{route}}"
@@ -110,20 +116,17 @@
         data="{{routeData}}"></app-route>
 
       <iron-pages selected="[[routeData.view]]" attr-for-selected="data-route">
-        <!-- Need to do this little hack to get it working on github pages as
-          the base URL is /emoji-caption -->
-        <!-- <image-input-view data-route="emoji-caption" route={{subroute}} image={{image}}></image-input-view>
-        <image-caption-view data-route="emoji-caption/caption" image={{image}}></image-caption-view> -->
-          
-        <!-- Real routes -->
-        <image-input-view data-route="" route="{{route}}" image={{image}} image-url={{imageUrl}}></image-input-view>
+        <image-input-view 
+          data-route=""
+          route="{{route}}"
+          id="image-input-view"
+          image-url={{imageUrl}}
+          image-loading={{imageLoading}}></image-input-view>
         <image-caption-view 
           data-route="caption" 
           route={{route}} 
-          image-url={{imageUrl}}
-          image={{image}} 
-          image-error={{imageError}}
-          image-loaded={{imageLoaded}}>
+          id="image-caption-view"
+          image-url={{imageUrl}}>
         </image-caption-view>
       </iron-pages>
 
@@ -152,28 +155,21 @@
             type: String,
             value: []
           },
+          image: {
+            type: String,
+          },
           imageUrl: {
             type: String
           },
-          image: {
-            type: String,
-            // value: "https://scontent-lht6-1.xx.fbcdn.net/v/t31.0-8/21740791_10213348048084662_6877420926499152050_o.jpg?oh=1dcebc2cba8aa82709fd92354b0ba32b&oe=5AC04B76"
-          },
-          imageError: {
+          imageLoading: {
             type: Boolean,
             value: false,
-            observer: '_imageErrorChange'
-          },
-          imageLoaded: {
-            type: Boolean,
-            value: false,
-            observer: '_imageLoadedChange'
           }
         };
       }
 
       constructor() {
-        super()
+        super();
 
         // get all emojis that have either any of the following keywords
         // associated with them
@@ -186,11 +182,25 @@
       connectedCallback() {
         super.connectedCallback()
 
-        if (!this.image) {
+        if (!this.imageUrl) {
           this.set('route.path', '/emoji-caption/');
         } else {
           this.set('route.path', '/emoji-caption/caption');
         }
+
+        const imageInputView = this.$['image-input-view'];
+        imageInputView.addEventListener('imageUrlSubmitted', (e) => {
+          console.log('imageurlsubmitted', this.imageUrl);
+
+          const imageCaptionView = this.$['image-caption-view'];
+          imageCaptionView.addEventListener('imageLoaded', this._imageLoaded);
+          imageCaptionView.addEventListener('imageError', this._imageError);
+
+          this.timeout = setTimeout(() => {
+            this.imageLoading = true
+          }, 0);
+          imageCaptionView.loadImageAndCaption(this.imageUrl)
+        });
       }
 
       _randomKeyword(keywords) {
@@ -200,20 +210,24 @@
         return keyword
       }
 
-      _imageLoadedChange(newval, oldval) {
-        const loaded = newval;
-        if (loaded) {
-          this.set('route.path', 'emoji-caption/caption/');
-          this.imageLoaded = false;
-        }
+      _imageLoaded = (e) => {
+        this.$['image-caption-view'].removeEventListener('imageLoaded', this._imageLoaded);
+        clearTimeout(this.timeout);
+
+        this.set('route.path', 'emoji-caption/caption/');
+        this.imageLoading = false;
+        this.imageUrl = "";
       }
 
-      _imageErrorChange(newval, oldval) {
-        const error = newval;
-        if (error) {
-          console.log('error in image loading')
-          this.imageError = false;
-        }
+      _imageError = (e) => {
+        this.$['image-caption-view'].removeEventListener('imageError', this._imageError);
+        clearTimeout(this.timeout);
+
+        this.set('route.path', 'emoji-caption/');
+        this.imageLoading = false;
+
+        this.$.modal.open();
+        this.imageUrl = "";
       }
     }
 

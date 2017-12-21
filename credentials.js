@@ -1,6 +1,6 @@
 module.exports = {
   azure: {
-   region: null,
-   subscriptionKey: null 
+   region: "westeurope",
+   subscriptionKey: "549fc771e42945c88038c6404ff10040" 
   }
 };

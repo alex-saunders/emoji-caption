@@ -19,28 +19,40 @@
         align-items: center;
       }
 
-      img {
-        max-width: 100%;
-        max-height: 450px;
+      paper-card {
+        width: 100%;
       }
 
-      .card-title {
+      .image-wrapper {
+        width: 100%;
+      }
+      .image-wrapper > img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+      }
+
+      .caption-container {
+        padding: 0 16px;
+      }
+      .caption-title {
         @apply --paper-font-headline; 
         text-align: center;
       }
-      .card-subtitle {
+      .caption-subtitle {
         @apply --paper-font-subhead;
+        color: black;
         text-align: center;
+        text-transform: capitalize;
+        font-style: italic;
       }
 
       .space-between {
         display: flex;
         justify-content: space-between;
         align-items: center;
-      }
-      .justify-end {
-        display: flex;
-        justify-content: flex-end;
       }
 
       .card-actions > * {
@@ -60,26 +72,31 @@
         color: var(--paper-grey-500);
       }
     </style>
-    <emoji-caption-generator id="captionGenerater" image={{_imageUrl}}></emoji-caption-generator>
+    <emoji-caption-generator
+      id="captionGenerater"
+      image-url={{imageUrl}}></emoji-caption-generator>
     <paper-card>
-        <img id="img" src={{image}} on-error="_onImageError" on-load="_onImageLoad">
-        <p class="card-title">
+      <div class="image-wrapper" id="img-wrapper">
+      </div>
+      <div class="caption-container">
+        <p class="caption-title" id="emojis">
           <template is="dom-repeat" items="{{keywords}}">
               <emoji-generator keyword={{item}}></emoji-generator>
           </template>
         </p>
-        <p class="card-subtitle">
-          {{caption}}
+        <p class="caption-subtitle">
+          "{{caption}}"
         </p>
-        <div class="card-actions">
-          <div class="horizontal space-between">
-            <div class="align-center">
-              <paper-icon-button icon="thumb-up" class="positive"></paper-icon-button>
-              <paper-icon-button icon="thumb-down" class="negative"></paper-icon-button> 
-            </div> 
-            <paper-button class="dark"><iron-icon icon="refresh"></iron-icon>Generate Again</paper-button>                  
-          </div>                         
-        </div>
+      </div>
+      <div class="card-actions">
+        <div class="horizontal space-between">
+          <div class="align-center">
+            <paper-icon-button icon="thumb-up" class="positive"></paper-icon-button>
+            <paper-icon-button icon="thumb-down" class="negative"></paper-icon-button> 
+          </div> 
+          <paper-button class="dark" on-click="_regenerateCaption"><iron-icon icon="refresh"></iron-icon>Generate Again</paper-button>                  
+        </div>                         
+      </div>
     </paper-card>
   </template>
   <script>
@@ -92,40 +109,72 @@
       static get properties() {
         return {
           imageUrl: {
-            type: String,
-          },
-          image: {
-            type: String,
-          },
-          imageError: {
-            type: Boolean,
-            notify: true,
-          },
-          imageLoaded: {
-            type: Boolean,
-            notify: true
+            type: String
           }
         };
       }
 
       connectedCallback() {
         super.connectedCallback()
-
-        this.$['captionGenerater'].addEventListener('captionGenerated', this._captionGenerated);
       }
 
-      _onImageError = () => {
-        this.imageError = true;
+      _scaleAndPlaceImage = (image) => {
+        const imgWidth = image.naturalWidth;
+        const imgHeight = image.naturalHeight;
+
+        const aspectRatio = imgHeight / (imgWidth / 100);
+        this.$['img-wrapper'].style.paddingTop = `${aspectRatio}%`;
+
+        this.$['img-wrapper'].innerHTML = "";
+        this.$['img-wrapper'].append(image);
       }
 
-      _onImageLoad = () => {
-        this.set('imageLoaded', true);
-        this._imageUrl = this.imageUrl;
+      _regenerateCaption() {
+        if (this.keywords === null) { return; }
+
+        const emojiGenerators = this.shadowRoot.querySelectorAll('emoji-generator');
+
+        for (let emojiGenerator of emojiGenerators) {
+          emojiGenerator.generateEmoji();
+          console.log(emojiGenerator.emoji);
+        }
       }
 
-      _captionGenerated = (e) => {
-        this.caption = e.detail.caption;
-        this.keywords = e.detail.keywords;
+      _loadImage() {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            this._scaleAndPlaceImage(img);
+            resolve();
+          }
+          img.onerror = (err) => {
+            reject(err);
+          }
+          img.src = this.imageUrl;
+        });
+      }
+
+      _loadCaption() {
+        return new Promise((resolve, reject) => {
+          const captionGenerator = this.$['captionGenerater']
+          captionGenerator.addEventListener('captionGenerated', (e) => {
+            this.caption = e.detail.caption;
+            this.keywords = e.detail.keywords;
+            resolve();
+          });
+          captionGenerator.addEventListener('captionError', (err) => {
+            reject(err);
+          });
+          captionGenerator.generateCaption();
+        });
+      }
+
+      loadImageAndCaption() {
+        Promise.all([this._loadImage(), this._loadCaption()]).then((values) => {
+          this.dispatchEvent(new CustomEvent('imageLoaded', {}));
+        }).catch((err) => {
+          this.dispatchEvent(new CustomEvent('imageError', {}));
+        })
       }
     }
 

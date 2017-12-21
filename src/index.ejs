@@ -8,6 +8,7 @@
     <meta name="description" content="Automatically generated emoji captions for your images">
     
     <link rel="manifest" href="/manifest.json">
+    <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
   </head>
   <body>
     <emoji-caption-app></emoji-caption-app>
@@ -23,12 +24,12 @@
         document.addEventListener('WebComponentsReady', function componentsReady() {
           document.removeEventListener('WebComponentsReady', componentsReady, false);
           var script = document.createElement('script');
-          script.src = '/<%= htmlWebpackPlugin.files.js[0] %>';
+          script.src = '<%= htmlWebpackPlugin.files.js[0] %>';
           var refScript = document.getElementsByTagName('script')[0];
           refScript.parentNode.insertBefore(script, refScript);
         }, false);
       })();
     </script>
-    <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
   </body>
 </html>
