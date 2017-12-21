@@ -83,7 +83,7 @@
           <div class="form">
             <iron-form id="iron-form">  
               <form on-submit="_loadImage">    
-                <paper-input value={{imageURL}} on-keydown="_checkForEnter" label="Image URL">
+                <paper-input value={{_imageUrl}} on-keydown="_checkForEnter" label="Image URL">
                 <paper-icon-button icon="send" slot="suffix" on-tap="_submitForm" type="submit"></paper-icon-button>   
               </paper-input>    
               </form>
@@ -115,8 +115,9 @@
             type: String,
             notify: true,
           },
-          imageURL: {
+          imageUrl: {
             type: String,
+            notify: true,
           },
           active: {
             type: Boolean,
@@ -136,7 +137,7 @@
       _loadImage = (e) => {
         e.preventDefault()
 
-        if (this.imageURL == null) {
+        if (this._imageUrl == null) {
           console.log('no image selected!')
           return;
         }
@@ -145,14 +146,13 @@
           this.active = true
         }, 200);
 
-        fetch(this.imageURL).then((response) => {
+        fetch(this._imageUrl).then((response) => {
           return response.blob();
         }).then((myBlob) => {
           const objectURL = URL.createObjectURL(myBlob);
           this.image = objectURL
+          this.imageUrl = this._imageUrl
           
-          this.set('route.path', 'emoji-caption/caption/');
-
           clearTimeout(this.timeout);
           this.active = false;
         });

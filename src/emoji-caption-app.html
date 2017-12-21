@@ -12,6 +12,8 @@
 <link rel="import" href="./views/image-input-view.html">
 <link rel="import" href="./views/image-caption-view.html">
 
+<link rel="import" href="./components/emoji-generator.html">
+
 <custom-style>
   <style is="custom-style">
     html, body {
@@ -21,9 +23,11 @@
       margin: 0;
       width: 100vw;
       height: 100vh;
+      overflow: auto;
       background: #fcfcfc;
 
       --theme-primary: var(--paper-deep-purple-a700);
+      --theme-secondary: var(--paper-deep-purple-900);
     }
     @media (max-width: 760px) { 
       body {
@@ -46,7 +50,12 @@
         align-items: center;
         justify-content: center;
         width: 100%;
-        height: 100%;
+        min-height: 100%;
+      }
+      @media (max-width: 760px) { 
+        :host {
+          justify-content: space-around;
+        }
       }
 
       .content-container {
@@ -54,6 +63,7 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
+        padding-bottom: 8px;
       }
 
       .page-title {
@@ -82,19 +92,22 @@
       }
     </style>
     <!-- ☪️ 🅰️ 🅿️ ✝️ ℹ️ 🅾️ ♑️ -->
-    <div></div>
-    <div class="content-container">
-        <app-location route="{{route}}"></app-location>
-        <app-route
-          route="{{route}}"
-          pattern="/emoji-caption/:view"
-          data="{{routeData}}"></app-route>
+    <h1 class="page-title">
+      <span class="page-title-emoji">
+        <emoji-generator keywords=[[keyword1]]></emoji-generator>
+      </span>
+      <span class="page-title-text">Emoji Caption</span>
+      <span class="page-title-emoji">
+        <emoji-generator keywords=[[keyword2]]></emoji-generator>
+      </span>
+    </h1>  
 
-      <h1 class="page-title">
-        <span class="page-title-emoji">[[emoji1]]</span>
-        <span class="page-title-text">Emoji Caption</span>
-        <span class="page-title-emoji">[[emoji2]]</span>
-      </h1>  
+    <div class="content-container">
+      <app-location route="{{route}}"></app-location>
+      <app-route
+        route="{{route}}"
+        pattern="/emoji-caption/:view"
+        data="{{routeData}}"></app-route>
 
       <iron-pages selected="[[routeData.view]]" attr-for-selected="data-route">
         <!-- Need to do this little hack to get it working on github pages as
@@ -103,8 +116,15 @@
         <image-caption-view data-route="emoji-caption/caption" image={{image}}></image-caption-view> -->
           
         <!-- Real routes -->
-        <image-input-view data-route="" route="{{route}}" image={{image}}></image-input-view>
-        <image-caption-view data-route="caption" route={{route}} image={{image}}></image-caption-view>
+        <image-input-view data-route="" route="{{route}}" image={{image}} image-url={{imageUrl}}></image-input-view>
+        <image-caption-view 
+          data-route="caption" 
+          route={{route}} 
+          image-url={{imageUrl}}
+          image={{image}} 
+          image-error={{imageError}}
+          image-loaded={{imageLoaded}}>
+        </image-caption-view>
       </iron-pages>
 
     </div>
@@ -116,7 +136,6 @@
   </template>
 
   <script>
-    const emoji = require("emojilib")
     /**
      * @customElement
      * @polymer
@@ -125,16 +144,30 @@
       static get is() { return 'emoji-caption-app'; }
       static get properties() {
         return {
-          emoji1: {
+          keyword1: {
             type: String,
-            value: " "
+            value: []
           },
-          emoji2: {
+          keyword2: {
             type: String,
-            value: " "
+            value: []
+          },
+          imageUrl: {
+            type: String
           },
           image: {
-            type: String
+            type: String,
+            // value: "https://scontent-lht6-1.xx.fbcdn.net/v/t31.0-8/21740791_10213348048084662_6877420926499152050_o.jpg?oh=1dcebc2cba8aa82709fd92354b0ba32b&oe=5AC04B76"
+          },
+          imageError: {
+            type: Boolean,
+            value: false,
+            observer: '_imageErrorChange'
+          },
+          imageLoaded: {
+            type: Boolean,
+            value: false,
+            observer: '_imageLoadedChange'
           }
         };
       }
@@ -146,35 +179,41 @@
         // associated with them
         const keywordsToInclude = ['face', 'photo']
 
-        this.entries = Object.entries(emoji.lib).filter((entry) => {
-          const keywords = entry[1].keywords
-          if (keywords && keywords.length > 0) {
-            for (let keywordToInclude of keywordsToInclude) {
-              if (keywords.includes(keywordToInclude)) { return true }
-            }
-            return false
-          }
-          return false
-        })
+        this.keyword1 = this._randomKeyword(keywordsToInclude);
+        this.keyword2 = this._randomKeyword(keywordsToInclude);
       }
 
       connectedCallback() {
         super.connectedCallback()
 
-        this.emoji1 = this.getEmoji()
-        this.emoji2 = this.getEmoji()
-
-        console.log(this.route)
         if (!this.image) {
           this.set('route.path', '/emoji-caption/');
+        } else {
+          this.set('route.path', '/emoji-caption/caption');
         }
       }
 
-      getEmoji() {
-        const index = Math.floor(Math.random() * this.entries.length)
-        const entry = this.entries[index][1]
+      _randomKeyword(keywords) {
+        const index = Math.floor(Math.random() * keywords.length)
+        const keyword = keywords[index]
 
-        return entry.char
+        return keyword
+      }
+
+      _imageLoadedChange(newval, oldval) {
+        const loaded = newval;
+        if (loaded) {
+          this.set('route.path', 'emoji-caption/caption/');
+          this.imageLoaded = false;
+        }
+      }
+
+      _imageErrorChange(newval, oldval) {
+        const error = newval;
+        if (error) {
+          console.log('error in image loading')
+          this.imageError = false;
+        }
       }
     }
 

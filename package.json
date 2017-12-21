@@ -20,6 +20,7 @@
     "webpack-dev-server": "^2.5.0"
   },
   "dependencies": {
-    "emojilib": "^2.2.9"
+    "emojilib": "^2.2.9",
+    "query-string": "^5.0.1"
   }
 }

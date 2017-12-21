@@ -1,0 +1,92 @@
+<link rel="import" href="~/polymer/polymer-element.html">
+
+<link rel="import" href="./emoji-generator.html">
+
+<dom-module id="emoji-caption-generator">
+  <template>
+    <!-- <CSS> -->
+    <style>
+
+    </style> <!-- </CSS> -->
+
+    <!-- <HTML> -->
+      {{caption}}
+
+    <!-- </HTML> -->
+  </template>
+
+  <script>
+    const queryString = require('query-string');
+
+    /**
+     * @customElement
+     * @polymer
+     */
+    class EmojiCaptionGenerator extends Polymer.Element {
+      static get is() { return 'emoji-caption-generator'; }
+      static get properties() {
+        return {
+          image: {
+            type: String,
+            observer: '_imageUpdated'
+          }
+        };
+      }
+
+      connectedCallback() {
+        super.connectedCallback()
+      }
+
+      _imageUpdated(newval, oldval) {
+        console.log('image updated', newval);
+        if (newval !== oldval && newval != null) {
+          this._processImage(newval);
+        }
+      }
+
+      _processImage(imageURL) {
+        const subscriptionKey = ""
+        const uriBase = "https://westeurope.api.cognitive.microsoft.com/vision/v1.0/analyze";
+
+        const params = {
+            "visualFeatures": "Categories,Description,Color",
+            "details": "",
+            "language": "en",
+        };
+
+        const headers = new Headers({
+          "Content-Type": "application/json",
+          "Ocp-Apim-Subscription-Key": subscriptionKey
+        });
+
+        const url = `${uriBase}?${queryString.stringify(params)}`;
+
+        fetch(url, {
+          headers: headers,
+          method: 'POST',
+          body: `{"url": "${imageURL}"}`,
+          mode: 'no-cors'
+        }).then((data) => {
+          return data.json();
+        }).then((response) => {
+          this._captionGenerated(response);
+        }).catch((err) => {
+          console.log(err);
+        })
+      }
+
+      _captionGenerated(data) {
+        const caption = data.description.captions[0].text;
+
+        this.dispatchEvent(new CustomEvent('captionGenerated', {
+          detail: {
+            caption: caption,
+            keywords: caption.split(" ")
+          }
+        }));
+      }
+    }
+
+    window.customElements.define(EmojiCaptionGenerator.is, EmojiCaptionGenerator);
+  </script>
+</dom-module>

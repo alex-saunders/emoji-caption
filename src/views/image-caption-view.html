@@ -1,5 +1,14 @@
 <link rel="import" href="~/polymer/polymer-element.html">
 
+<link rel="import" href="~/paper-styles/typography.html">
+<link rel="import" href="~/paper-styles/color.html">
+<link rel="import" href="~/paper-card/paper-card.html">
+<link rel="import" href="~/paper-button/paper-button.html">
+<link rel="import" href="~/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="~/iron-icons/iron-icons.html">
+
+<link rel="import" href="../components/emoji-caption-generator.html">
+
 <dom-module id="image-caption-view">
   <template>
     <style>
@@ -12,11 +21,66 @@
 
       img {
         max-width: 100%;
+        max-height: 450px;
+      }
+
+      .card-title {
+        @apply --paper-font-headline; 
+        text-align: center;
+      }
+      .card-subtitle {
+        @apply --paper-font-subhead;
+        text-align: center;
+      }
+
+      .space-between {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .justify-end {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .card-actions > * {
+        @apply --paper-font-body2;
+      }
+      .light {
+        color: var(--paper-grey-600);
+      }
+      .dark {
+        color: var(--paper-grey-800);
+      }
+
+      .positive {
+        color: var(--paper-grey-500);
+      }
+      .negative {
+        color: var(--paper-grey-500);
       }
     </style>
-        
-      <img id="img" src={{image}}>
-
+    <emoji-caption-generator id="captionGenerater" image={{_imageUrl}}></emoji-caption-generator>
+    <paper-card>
+        <img id="img" src={{image}} on-error="_onImageError" on-load="_onImageLoad">
+        <p class="card-title">
+          <template is="dom-repeat" items="{{keywords}}">
+              <emoji-generator keyword={{item}}></emoji-generator>
+          </template>
+        </p>
+        <p class="card-subtitle">
+          {{caption}}
+        </p>
+        <div class="card-actions">
+          <div class="horizontal space-between">
+            <div class="align-center">
+              <paper-icon-button icon="thumb-up" class="positive"></paper-icon-button>
+              <paper-icon-button icon="thumb-down" class="negative"></paper-icon-button> 
+            </div> 
+            <paper-button class="dark"><iron-icon icon="refresh"></iron-icon>Generate Again</paper-button>                  
+          </div>                         
+        </div>
+    </paper-card>
   </template>
   <script>
     /**
@@ -27,14 +91,41 @@
       static get is() { return 'image-caption-view'; }
       static get properties() {
         return {
+          imageUrl: {
+            type: String,
+          },
           image: {
             type: String,
           },
+          imageError: {
+            type: Boolean,
+            notify: true,
+          },
+          imageLoaded: {
+            type: Boolean,
+            notify: true
+          }
         };
       }
 
       connectedCallback() {
         super.connectedCallback()
+
+        this.$['captionGenerater'].addEventListener('captionGenerated', this._captionGenerated);
+      }
+
+      _onImageError = () => {
+        this.imageError = true;
+      }
+
+      _onImageLoad = () => {
+        this.set('imageLoaded', true);
+        this._imageUrl = this.imageUrl;
+      }
+
+      _captionGenerated = (e) => {
+        this.caption = e.detail.caption;
+        this.keywords = e.detail.keywords;
       }
     }
 

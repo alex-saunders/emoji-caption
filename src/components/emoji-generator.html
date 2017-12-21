@@ -1,0 +1,76 @@
+<link rel="import" href="~/polymer/polymer-element.html">
+
+<dom-module id="emoji-generator">
+  <template>
+    <!-- <CSS> -->
+    <style>
+
+    </style> <!-- </CSS> -->
+
+    <!-- <HTML> -->
+      {{emoji}}
+    <!-- </HTML> -->
+  </template>
+
+  <script>
+    const emoji = require("emojilib")
+
+    /**
+     * @customElement
+     * @polymer
+     */
+    class EmojiGenerator extends Polymer.Element {
+      static get is() { return 'emoji-generator'; }
+      static get properties() {
+        return {
+          keyword: {
+            type: String,
+            value: [],
+            observer: '_keywordUpdated',
+          },
+          emoji: {
+            type: String,
+            value: " "
+          }
+        };
+      }
+
+      constructor() {
+        super();
+
+        this.generateEmoji();
+      }
+
+      connectedCallback() {
+        super.connectedCallback()
+      }
+
+      _keywordUpdated(newval) {
+        if (newval !== null) {
+          this.generateEmoji()
+        }
+      }
+
+      generateEmoji() {
+        const entries = Object.entries(emoji.lib).filter((entry) => {
+          const keywords = entry[1].keywords
+          if (keywords && keywords.length > 0) {
+            if (keywords.includes(this.keyword)) { return true }
+            return false
+          }
+          return false
+        })
+
+        if (entries.length < 1) { return; }
+
+        const index = Math.floor(Math.random() * entries.length)
+        const entry = entries[index][1]
+
+        this.emoji = entry.char
+      }
+
+    }
+
+    window.customElements.define(EmojiGenerator.is, EmojiGenerator);
+  </script>
+</dom-module>
