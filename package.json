@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "webpack --watch",
-    "start": "webpack"
+    "start": "bower i && webpack"
   },
   "author": "Rob Dodson",
   "license": "Apache-2.0",
