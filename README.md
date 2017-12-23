@@ -2,7 +2,7 @@
 
 Automatically generated emoji captions for your images
 
-![preview](https://user-images.githubusercontent.com/22820481/34322610-c468417e-e823-11e7-9e6c-8be272450496.png)
+![preview](https://user-images.githubusercontent.com/22820481/34322658-77dc95b0-e825-11e7-8d49-8ae3ba03b84b.png)
 
 Emoji caption automatically generates captions for your images and provides an emoji translation!
 
