@@ -2,6 +2,8 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var path = require('path');
 
+const devServerPort = 9000;
+
 module.exports = {
   // Tell Webpack which file kicks off our app.
   entry: path.resolve(__dirname, 'src/index.js'),
@@ -60,15 +62,14 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'docs'),
     compress: true,
-    port: 9000,
+    port: devServerPort,
     historyApiFallback: {
       index: '/'
     },
     proxy: {
       "/emoji-caption/**/*.js": {
-        target: "http://localhost:9000",
+        target: `http://localhost:${devServerPort}`,
         pathRewrite: {"^/emoji-caption" : ""}
-    
       }
     }
   },

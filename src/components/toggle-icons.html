@@ -1,0 +1,55 @@
+<link rel="import" href="~/polymer/polymer-element.html">
+
+<dom-module id="toggle-icons">
+  <template>
+    <!-- <CSS> -->
+    <style>
+
+    </style> <!-- </CSS> -->
+
+    <!-- <HTML> -->
+      <slot>
+
+      </slot>
+    <!-- </HTML> -->
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class ToggleIcons extends Polymer.Element {
+      static get is() { return 'toggle-icons'; }
+      static get properties() {
+        return {
+        };
+      }
+
+      connectedCallback() {
+        super.connectedCallback()
+
+        this.toggleIcons = this.shadowRoot
+          .querySelector('slot')
+          .assignedNodes({flatten:true})
+          .filter(n => { return n.nodeType === Node.ELEMENT_NODE });
+
+        for (let toggleIcon of this.toggleIcons) {
+          toggleIcon.addEventListener('click', this._toggleIcons)
+        }
+      }
+
+      _toggleIcons = (e) => {
+        for (let toggleIcon of this.toggleIcons) {
+          if (toggleIcon == e.target) {
+            toggleIcon.toggled = true;
+          } else {
+            toggleIcon.toggled = false;
+          }
+        }
+      }
+    }
+
+    window.customElements.define(ToggleIcons.is, ToggleIcons);
+  </script>
+</dom-module>

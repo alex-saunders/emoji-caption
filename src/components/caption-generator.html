@@ -2,7 +2,7 @@
 
 <link rel="import" href="./emoji-generator.html">
 
-<dom-module id="emoji-caption-generator">
+<dom-module id="caption-generator">
   <template>
     <!-- <CSS> -->
     <style>
@@ -23,8 +23,8 @@
      * @customElement
      * @polymer
      */
-    class EmojiCaptionGenerator extends Polymer.Element {
-      static get is() { return 'emoji-caption-generator'; }
+    class CaptionGenerator extends Polymer.Element {
+      static get is() { return 'caption-generator'; }
       static get properties() {
         return {
           imageUrl: {
@@ -76,8 +76,6 @@
         const caption = data.description.captions[0].text;
         const keywords = caption.split(" ");
 
-        console.log(keywords);
-
         this.dispatchEvent(new CustomEvent('captionGenerated', {
           detail: {
             caption,
@@ -87,6 +85,6 @@
       }
     }
 
-    window.customElements.define(EmojiCaptionGenerator.is, EmojiCaptionGenerator);
+    window.customElements.define(CaptionGenerator.is, CaptionGenerator);
   </script>
 </dom-module>

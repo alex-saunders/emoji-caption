@@ -190,8 +190,6 @@
 
         const imageInputView = this.$['image-input-view'];
         imageInputView.addEventListener('imageUrlSubmitted', (e) => {
-          console.log('imageurlsubmitted', this.imageUrl);
-
           const imageCaptionView = this.$['image-caption-view'];
           imageCaptionView.addEventListener('imageLoaded', this._imageLoaded);
           imageCaptionView.addEventListener('imageError', this._imageError);

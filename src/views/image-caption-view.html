@@ -7,7 +7,9 @@
 <link rel="import" href="~/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="~/iron-icons/iron-icons.html">
 
-<link rel="import" href="../components/emoji-caption-generator.html">
+<link rel="import" href="../components/caption-generator.html">
+<link rel="import" href="../components/toggle-icons.html">
+<link rel="import" href="../components/toggle-icon.html">
 
 <dom-module id="image-caption-view">
   <template>
@@ -64,18 +66,11 @@
       .dark {
         color: var(--paper-grey-800);
       }
-
-      .positive {
-        color: var(--paper-grey-500);
-      }
-      .negative {
-        color: var(--paper-grey-500);
-      }
     </style>
-    <emoji-caption-generator
+    <caption-generator
       id="captionGenerater"
-      image-url={{imageUrl}}></emoji-caption-generator>
-    <paper-card>
+      image-url={{imageUrl}}></caption-generator>
+    <paper-card elevation="3">
       <div class="image-wrapper" id="img-wrapper">
       </div>
       <div class="caption-container">
@@ -90,10 +85,10 @@
       </div>
       <div class="card-actions">
         <div class="horizontal space-between">
-          <div class="align-center">
-            <paper-icon-button icon="thumb-up" class="positive"></paper-icon-button>
-            <paper-icon-button icon="thumb-down" class="negative"></paper-icon-button> 
-          </div> 
+          <toggle-icons>
+            <toggle-icon icon="thumb-up" on-tap="_thumbsUp"></toggle-icon>
+            <toggle-icon icon="thumb-down" on-tap="_thumbsDown"></toggle-icon> 
+          </toggle-icons>
           <paper-button class="dark" on-click="_regenerateCaption"><iron-icon icon="refresh"></iron-icon>Generate Again</paper-button>                  
         </div>                         
       </div>
@@ -133,10 +128,8 @@
         if (this.keywords === null) { return; }
 
         const emojiGenerators = this.shadowRoot.querySelectorAll('emoji-generator');
-
         for (let emojiGenerator of emojiGenerators) {
           emojiGenerator.generateEmoji();
-          console.log(emojiGenerator.emoji);
         }
       }
 
@@ -175,6 +168,23 @@
         }).catch((err) => {
           this.dispatchEvent(new CustomEvent('imageError', {}));
         })
+      }
+
+      _thumbsUp = () => {
+        const emojis = this._getGeneratedEmojis();
+      }
+
+      _thumbsDown = () => {
+        const emojis = this._getGeneratedEmojis();
+      }
+
+      _getGeneratedEmojis() {
+        const emojiGenerators = this.$['emojis'].querySelectorAll('emoji-generator');
+        const emojis = [];
+        for (let emojiGenerator of emojiGenerators) {
+          emojis.push(emojiGenerator.emoji);
+        }
+        return emojis.filter((emoji) => emoji != null);
       }
     }
 
