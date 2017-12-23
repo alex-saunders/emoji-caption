@@ -42,8 +42,9 @@
       }
 
       _processImage(imageURL) {
-        const subscriptionKey = credentials.azure.subscriptionKey
-        const uriBase = `https://${credentials.azure.region}.api.cognitive.microsoft.com/vision/v1.0/analyze`;
+        const subscriptionKey = credentials.azure.subscriptionKey || process.env.SUBSCRIPTION_KEY
+        const region = credentials.azure.region || process.env.REGION
+        const uriBase = `https://${region}.api.cognitive.microsoft.com/vision/v1.0/analyze`;
 
         const params = {
             "visualFeatures": "Categories,Description,Color",

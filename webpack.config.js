@@ -23,6 +23,8 @@ module.exports = {
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'bower_components')
     ],
+    // ideally, we would use this for our imports, but
+    // it's not working with Glitch and i'm not really sure why
     alias: {
       "~": path.resolve(__dirname, 'bower_components/')
     }

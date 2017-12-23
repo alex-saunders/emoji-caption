@@ -1,11 +1,11 @@
 {
-  "name": "polymer-webpack-demo",
+  "name": "emoji-caption",
   "private": true,
-  "description": "A hello world example of polymer-webpack-loader.",
+  "description": "A simple app to generate emoji captions for images",
   "authors": [
-    "Rob Dodson"
+    "Alex Saunders"
   ],
-  "license": "Apache-2.0",
+  "license": "MIT",
   "ignore": [
     "**/.*",
     "node_modules",
