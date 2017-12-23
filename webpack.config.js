@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const WebpackShellPlugin = require('webpack-shell-plugin');
+const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
 const path = require('path');
 
 const devServerPort = 9000;
@@ -98,6 +99,17 @@ module.exports = {
       from: path.resolve(__dirname, 'bower_components/webcomponentsjs/*.js'),
       to: 'bower_components/webcomponentsjs/[name].[ext]'
     }]),
+    new CopyWebpackPlugin([{
+      from: path.resolve(__dirname, 'src/icons/*'),
+      to: 'icons/[name].[ext]'
+    }]),
+    new CopyWebpackPlugin([{
+      from: path.resolve(__dirname, 'manifest.json'),
+      to: 'manifest.json'
+    }]),
+    new ServiceWorkerWebpackPlugin({
+      entry: path.join(__dirname, 'src/sw.js'),
+    }),
     new WebpackShellPlugin({onBuildEnd: ['nodemon server.js --watch server.js']}),    
   ]
 };
