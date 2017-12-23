@@ -1,1 +1,0 @@
-console.log(process.env.AZURE_SUBSCRIPTION_KEY)
