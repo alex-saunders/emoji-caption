@@ -16,7 +16,7 @@
     </style> <!-- </CSS> -->
 
     <!-- <HTML> -->
-    <paper-icon-button icon="{{icon}}" on-click="_toggle" class$="[[computeClass(toggled)]]"></paper-icon-button> 
+    <paper-icon-button icon="{{icon}}" class$="[[computeClass(toggled)]]"></paper-icon-button> 
     <!-- </HTML> -->
   </template>
 
@@ -34,7 +34,8 @@
           },
           toggled: {
             type: Boolean,
-            value: false
+            value: false,
+            observer: '_toggledSet'
           }
         };
       }
@@ -43,12 +44,19 @@
         super.connectedCallback()
       }
 
-      _toggle() {
-        this.toggled = !this.toggled;
-      }
-
       computeClass(prop) {
         return prop ? 'toggled' : '';
+      }
+
+      _toggledSet(newval, oldval) {
+        if (newval == oldval) { return }
+
+        this.dispatchEvent(new CustomEvent('toggled', {
+          detail: {
+            newval,
+            oldval
+          }
+        }));
       }
     }
 

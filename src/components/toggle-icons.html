@@ -48,6 +48,12 @@
           }
         }
       }
+
+      resetIcons() {
+        for (let toggleIcon of this.toggleIcons) {
+          toggleIcon.toggled = false;
+        }
+      }
     }
 
     window.customElements.define(ToggleIcons.is, ToggleIcons);

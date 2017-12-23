@@ -1,6 +1,7 @@
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const WebpackShellPlugin = require('webpack-shell-plugin');
+const path = require('path');
 
 const devServerPort = 9000;
 
@@ -66,12 +67,12 @@ module.exports = {
     historyApiFallback: {
       index: '/'
     },
-    proxy: {
-      "/emoji-caption/**/*.js": {
-        target: `http://localhost:${devServerPort}`,
-        pathRewrite: {"^/emoji-caption" : ""}
-      }
-    }
+    // proxy: {
+    //   "/emoji-caption/**/*.js": {
+    //     target: `http://localhost:${devServerPort}`,
+    //     pathRewrite: {"^/emoji-caption" : ""}
+    //   }
+    // }
   },
   plugins: [
     // This plugin will generate an index.html file for us that can be used
@@ -87,6 +88,7 @@ module.exports = {
     new CopyWebpackPlugin([{
       from: path.resolve(__dirname, 'bower_components/webcomponentsjs/*.js'),
       to: 'bower_components/webcomponentsjs/[name].[ext]'
-    }])
+    }]),
+    new WebpackShellPlugin({onBuildEnd: ['nodemon server.js --watch server.js']}),    
   ]
 };

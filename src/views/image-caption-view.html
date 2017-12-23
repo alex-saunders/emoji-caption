@@ -70,7 +70,7 @@
     <caption-generator
       id="captionGenerater"
       image-url={{imageUrl}}></caption-generator>
-    <paper-card elevation="3">
+    <paper-card elevation="1">
       <div class="image-wrapper" id="img-wrapper">
       </div>
       <div class="caption-container">
@@ -85,9 +85,9 @@
       </div>
       <div class="card-actions">
         <div class="horizontal space-between">
-          <toggle-icons>
-            <toggle-icon icon="thumb-up" on-tap="_thumbsUp"></toggle-icon>
-            <toggle-icon icon="thumb-down" on-tap="_thumbsDown"></toggle-icon> 
+          <toggle-icons id="toggle-icons">
+            <toggle-icon icon="thumb-up" id="thumbs-up"></toggle-icon>
+            <toggle-icon icon="thumb-down" id="thumbs-down"></toggle-icon> 
           </toggle-icons>
           <paper-button class="dark" on-click="_regenerateCaption"><iron-icon icon="refresh"></iron-icon>Generate Again</paper-button>                  
         </div>                         
@@ -111,6 +111,9 @@
 
       connectedCallback() {
         super.connectedCallback()
+
+        this.$['thumbs-up'].addEventListener('toggled', this._thumbsUp);
+        this.$['thumbs-down'].addEventListener('toggled', this._thumbsDown);
       }
 
       _scaleAndPlaceImage = (image) => {
@@ -131,6 +134,8 @@
         for (let emojiGenerator of emojiGenerators) {
           emojiGenerator.generateEmoji();
         }
+
+        this.$['toggle-icons'].resetIcons();
       }
 
       _loadImage() {
@@ -170,12 +175,28 @@
         })
       }
 
-      _thumbsUp = () => {
+      _thumbsUp = (e) => {
+        if (e.detail.newval === false) { return; }
+
         const emojis = this._getGeneratedEmojis();
+        ga('send', {
+          hitType: 'event',
+          eventCategory: 'Emoji Rating',
+          eventAction: 'Thumbs Up',
+          eventLabel: `${this.caption} - ${emojis.toString()}`
+        });
       }
 
-      _thumbsDown = () => {
+      _thumbsDown = (e) => {
+        if (e.detail.newval === false) { return; }
+        
         const emojis = this._getGeneratedEmojis();
+        ga('send', {
+          hitType: 'event',
+          eventCategory: 'Emoji Rating',
+          eventAction: 'Thumbs Down',
+          eventLabel: `${this.caption} - ${emojis.toString()}`
+        });
       }
 
       _getGeneratedEmojis() {

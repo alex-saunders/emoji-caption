@@ -68,6 +68,10 @@
         --paper-input-container-focus-color: var(--theme-primary)
       }
 
+      .icon--photoLibrary {
+        visibility: hidden;
+      }
+
       @media (max-width: 760px) { 
         :host {
           justify-content: space-between;
@@ -89,14 +93,13 @@
               </form>
             </iron-form>
             <div>
-              <paper-icon-button icon="image:photo-library"></paper-icon-button>
+              <paper-icon-button icon="image:photo-library" class="icon--photoLibrary"></paper-icon-button>
               <!-- <paper-icon-button icon="image:photo-camera"></paper-icon-button> -->
             </div> 
           </div>          
           <div class="spinner-overlay" hidden={{!imageLoading}}>
             <paper-spinner alt="loading..." active={{imageLoading}}></paper-spinner>
           </div>
-        
       </div> 
     </paper-card> 
   </template>

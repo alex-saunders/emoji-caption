@@ -2,9 +2,13 @@
   "name": "polymer-webpack-demo",
   "version": "1.0.0",
   "description": "A hello world example of polymer-webpack-loader.",
+  "engines": {
+    "node": "8.5.0",
+    "npm": "5.3.0"
+  },
   "scripts": {
-    "start": "webpack-dev-server",
-    "build": "webpack"
+    "dev": "webpack --watch",
+    "start": "webpack"
   },
   "author": "Rob Dodson",
   "license": "Apache-2.0",
@@ -15,12 +19,15 @@
     "babel-preset-env": "^1.6.0",
     "copy-webpack-plugin": "^4.0.1",
     "html-webpack-plugin": "^2.29.0",
+    "nodemon": "^1.14.3",
     "polymer-webpack-loader": "^2.0.0",
     "webpack": "^3.0.0",
-    "webpack-dev-server": "^2.5.0"
+    "webpack-dev-server": "^2.5.0",
+    "webpack-shell-plugin": "^0.5.0"
   },
   "dependencies": {
     "emojilib": "^2.2.9",
+    "express": "^4.16.2",
     "query-string": "^5.0.1"
   }
 }

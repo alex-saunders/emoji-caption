@@ -112,7 +112,7 @@
       <app-location route="{{route}}"></app-location>
       <app-route
         route="{{route}}"
-        pattern="/emoji-caption/:view"
+        pattern="/:view"
         data="{{routeData}}"></app-route>
 
       <iron-pages selected="[[routeData.view]]" attr-for-selected="data-route">
@@ -183,9 +183,9 @@
         super.connectedCallback()
 
         if (!this.imageUrl) {
-          this.set('route.path', '/emoji-caption/');
+          this.set('route.path', '/');
         } else {
-          this.set('route.path', '/emoji-caption/caption');
+          this.set('route.path', '/caption');
         }
 
         const imageInputView = this.$['image-input-view'];
@@ -212,7 +212,7 @@
         this.$['image-caption-view'].removeEventListener('imageLoaded', this._imageLoaded);
         clearTimeout(this.timeout);
 
-        this.set('route.path', 'emoji-caption/caption/');
+        this.set('route.path', '/caption/');
         this.imageLoading = false;
         this.imageUrl = "";
       }
@@ -221,7 +221,7 @@
         this.$['image-caption-view'].removeEventListener('imageError', this._imageError);
         clearTimeout(this.timeout);
 
-        this.set('route.path', 'emoji-caption/');
+        this.set('route.path', '/');
         this.imageLoading = false;
 
         this.$.modal.open();
