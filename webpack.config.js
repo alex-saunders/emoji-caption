@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const WebpackShellPlugin = require('webpack-shell-plugin');
@@ -77,6 +78,12 @@ module.exports = {
     // }
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        AZURE_SUBSCRIPTION_KEY: JSON.stringify(process.env.AZURE_SUBSCRIPTION_KEY),
+        AZURE_REGION: JSON.stringify(process.env.AZURE_REGION)
+      },
+    }),
     // This plugin will generate an index.html file for us that can be used
     // by the Webpack dev server. We can give it a template file (written in EJS)
     // and it will handle injecting our bundle for us.
